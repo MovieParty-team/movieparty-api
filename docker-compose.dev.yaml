@@ -1,0 +1,16 @@
+# this is a development docker-compose file
+# docker-compose -f docker-compose.dev.yaml up -d
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: movieparty
+      POSTGRES_USER: movieparty
+      POSTGRES_DATABASE: movieparty
+      POSTGRES_ROOT_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - movieparty-db-data:/var/lib/mysql
+volumes:
+  movieparty-db-data:
