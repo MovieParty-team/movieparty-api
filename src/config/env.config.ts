@@ -1,0 +1,65 @@
+import { Logger } from '@nestjs/common';
+import 'dotenv/config';
+import env from 'src/types/env.type';
+
+class EnvConfig implements env {
+  nodeEnv: string;
+  apiPort: number;
+  apiHost: string;
+  dbHost: string;
+  dbPort: number;
+  dbName: string;
+  dbUser: string;
+  dbPass: string;
+  sessionSecret: string;
+  brcyptSaltRounds: number;
+  jwtSecret: string;
+
+  constructor() {
+    this.assignEnv();
+    this.assertEnv();
+    Logger.debug('Environment set up');
+  }
+
+  private assignEnv() {
+    this.nodeEnv = process.env.NODE_ENV;
+    this.apiPort = Number(process.env.API_PORT);
+    this.apiHost = process.env.API_HOST;
+    this.dbHost = process.env.POSTGRES_HOST;
+    this.dbPort = Number(process.env.POSTGRES_PORT);
+    this.dbName = process.env.POSTGRES_DB;
+    this.dbUser = process.env.POSTGRES_USER;
+    this.dbPass = process.env.POSTGRES_PASSWORD;
+    this.sessionSecret = process.env.SESSION_SECRET;
+    this.brcyptSaltRounds = Number(process.env.BCRYPT_SALT_ROUNDS);
+    this.jwtSecret = process.env.JWT_SECRET;
+  }
+
+  private assertEnv() {
+    for (const key in this) {
+      if (!this.hasOwnProperty(key)) {
+        continue;
+      }
+
+      const value = this[key];
+
+      if (typeof value === 'undefined' || value === null) {
+        throw new Error(`Missing env variable: ${key}`);
+      }
+
+      if (typeof value === 'string' && value.trim() === '') {
+        throw new Error(`Missing env variable: ${key}`);
+      }
+
+      if (typeof value === 'number' && isNaN(value)) {
+        throw new Error(`Missing env variable: ${key}`);
+      } else if (typeof value === 'number' && value === 0) {
+        Logger.warn(
+          `Zero value env for variable: ${key}. Check if your config is correct.`,
+        );
+      }
+    }
+  }
+}
+
+export const envConfig = new EnvConfig();
