@@ -96,7 +96,7 @@ export class IamService {
     });
   }
 
-  async refreshTokenSetup(user: User): Promise<{
+  async refreshTokenSet(user: User): Promise<{
     accessToken: string;
     refreshToken: string;
   }> {

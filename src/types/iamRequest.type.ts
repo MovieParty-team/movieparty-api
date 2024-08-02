@@ -5,8 +5,8 @@ export interface UserUuidRequest extends Request {
 }
 
 interface Session {
-  userUuid: string;
   accessToken: string;
+  refreshToken: string;
 }
 
 export interface RequestSession extends Request {

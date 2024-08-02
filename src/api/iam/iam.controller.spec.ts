@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { IamController } from './iam.controller';
-import { IamService } from '../../../services/iam.service';
-import { User } from '../../entities';
-import { typeOrmTestingConfig } from '../../../config/orm.config';
+import { IamService } from './iam.service';
+import { User } from 'src/api/entities';
+import { typeOrmTestingConfig } from '../../config/orm.config';
 
 describe('AppController', () => {
   let iamController: IamController;
@@ -33,6 +33,7 @@ describe('AppController', () => {
       lastname: 'lastname',
       bio: 'bio',
       avatar: 'avatar',
+      birthday: new Date(),
       userMovies: [],
       followers: [],
       following: [],

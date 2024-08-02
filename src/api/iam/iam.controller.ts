@@ -7,14 +7,20 @@ import {
   HttpStatus,
   Logger,
   Post,
+  Query,
   Req,
   UsePipes,
 } from '@nestjs/common';
-import { IamService } from '../services/iam.service';
+import { IamService } from './iam.service';
 import { RequestSession, UserUuidRequest } from 'src/types/iamRequest.type';
-import { CreateUserDto } from '../dtos/createUser.dto';
-import { UserCredentialsDto } from '../dtos/userCredentials.dto';
+import { CreateUserDto } from './dtos/createUser.dto';
+import { UserCredentialsDto } from './dtos/userCredentials.dto';
 import { ApiResponse } from 'src/types/apiResponse.type';
+import { ZodValidationPipe } from 'src/api/validators/zod.validator';
+import { createUserSchema } from './schemas/createUser.schema';
+import { userCredentialsSchema } from './schemas/userCredentials.schema';
+import { SkipAuth } from 'src/utils/skipAuth.utils';
+import { UserOutput } from './output/user.output';
 
 @Controller({
   path: '/api',
@@ -27,18 +33,30 @@ export class IamController {
     private readonly userCredentialsDto: UserCredentialsDto,
   ) {}
 
-  @Get('user')
-  async getUser(@Req() request: UserUuidRequest) {
-    Logger.debug(request.uuid);
-    if (request.uuid) {
-      return await this.iamService.getUserByUuid(request.uuid);
+  @Get('/user')
+  async getUser(
+    @Query() query: UserUuidRequest,
+    @Req() request: RequestSession,
+  ): Promise<ApiResponse<UserOutput>> {
+    Logger.debug(query.uuid);
+    if (query.uuid) {
+      const user = new UserOutput(
+        await this.iamService.getUserByUuid(query.uuid),
+      );
+      return {
+        data: user,
+        message: 'user',
+        success: true,
+        accessToken: request.session.accessToken,
+      };
     }
     throw new HttpException('Error loading user', HttpStatus.BAD_REQUEST);
   }
 
   @Post('/auth/register')
   @HttpCode(200)
-  @UsePipes()
+  @UsePipes(new ZodValidationPipe(createUserSchema))
+  @SkipAuth()
   async registerUser(
     @Body() body: CreateUserDto,
     @Req() request: RequestSession,
@@ -51,7 +69,8 @@ export class IamController {
       throw new HttpException('Error creating user', HttpStatus.BAD_REQUEST);
     }
 
-    request.session.userUuid = refreshToken;
+    request.session.refreshToken = refreshToken;
+    request.session.accessToken = accessToken;
     request.session.save();
     return {
       data: { accessToken },
@@ -62,6 +81,8 @@ export class IamController {
 
   @Post('/auth/login')
   @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(userCredentialsSchema))
+  @SkipAuth()
   async loginUser(
     @Body() body: UserCredentialsDto,
     @Req() request: RequestSession,
@@ -74,7 +95,8 @@ export class IamController {
       throw new HttpException('Error creating user', HttpStatus.BAD_REQUEST);
     }
 
-    request.session.userUuid = refreshToken;
+    request.session.refreshToken = refreshToken;
+    request.session.accessToken = accessToken; // we also save the access token in the session in case frontend doesn't save it
     request.session.save();
     return {
       data: { accessToken },

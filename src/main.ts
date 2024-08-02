@@ -3,13 +3,7 @@ import { AppModule } from './app.module';
 import { envConfig } from './config/env.config';
 import 'dotenv/config';
 import * as session from 'express-session';
-
-declare module 'express-session' {
-  interface SessionData {
-    userUuid: string;
-    token: string;
-  }
-}
+import { Logger } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -18,11 +12,17 @@ async function bootstrap() {
       secret: envConfig.sessionSecret,
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 60000, httpOnly: false, sameSite: 'lax' },
+      cookie: {
+        maxAge: 60000,
+        httpOnly: envConfig.nodeEnv === 'production', // false in dev for debug
+        sameSite: 'lax',
+      },
       name: 'movieparty.session',
     }),
   );
 
   await app.listen(process.env.API_PORT);
+  app.enableCors();
+  Logger.debug(`Application listening on port ${process.env.API_PORT}`);
 }
 bootstrap();

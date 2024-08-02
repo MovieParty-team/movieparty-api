@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities';
-import { IamController } from './controllers/iam.controller';
-import { IamService } from './services/iam.service';
+import { IamController } from './iam.controller';
+import { IamService } from './iam.service';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserCredentialsDto } from './dtos/userCredentials.dto';
 import { JwtModule } from '@nestjs/jwt';
