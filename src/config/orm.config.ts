@@ -1,8 +1,6 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 import { envConfig } from './env.config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DynamicModule } from '@nestjs/common';
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
@@ -17,16 +15,6 @@ export const dataSourceOptions: DataSourceOptions = {
   subscribers: [],
   migrations: ['dist/migrations/*.{js,ts}'],
 };
-
-export const typeOrmTestingConfig = (): DynamicModule =>
-  TypeOrmModule.forRoot({
-    ...dataSourceOptions,
-    schema: 'test',
-    entities: ['dist/**/*.entity.{js,ts}'],
-    keepConnectionAlive: true,
-    dropSchema: true,
-    synchronize: true,
-  });
 
 const dataSource = new DataSource(dataSourceOptions);
 

@@ -1,20 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { dataSourceOptions } from './config/orm.config';
+import { ApiModule } from './api/api.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { IamModule } from './api/iam/iam.module';
-import { AuthGuard } from './api/iam/auth.guard';
+import { dataSourceOptions } from './config/orm.config';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), IamModule],
-  controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: 'APP_GUARD',
-      useClass: AuthGuard,
-    },
-  ],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), ApiModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

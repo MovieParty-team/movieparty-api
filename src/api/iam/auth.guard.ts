@@ -8,9 +8,9 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { envConfig } from 'src/config/env.config';
-import { RequestSession } from 'src/types/iamRequest.type';
-import { IS_SKIP_AUTH } from 'src/utils/skipAuth.utils';
+import { envConfig } from '@/config/env.config';
+import { RequestSession } from '@/types/iamRequest.type';
+import { IS_SKIP_AUTH } from '@/utils/skipAuth.utils';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -78,7 +78,6 @@ export class AuthGuard implements CanActivate {
   ): Promise<void> {
     const payload = { sub: sub };
     Logger.log('payload:', payload);
-    Logger.log('envConfig.jwtSecret:', envConfig.jwtSecret);
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '60s',
       secret: envConfig.jwtSecret,

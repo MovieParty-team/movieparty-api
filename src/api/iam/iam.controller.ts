@@ -12,14 +12,14 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { IamService } from './iam.service';
-import { RequestSession, UserUuidRequest } from 'src/types/iamRequest.type';
+import { RequestSession, UserUuidRequest } from '@/types/iamRequest.type';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserCredentialsDto } from './dtos/userCredentials.dto';
-import { ApiResponse } from 'src/types/apiResponse.type';
-import { ZodValidationPipe } from 'src/api/validators/zod.validator';
+import { ApiResponse } from '@/types/apiResponse.type';
+import { ZodValidationPipe } from '@/api/validators/zod.validator';
 import { createUserSchema } from './schemas/createUser.schema';
 import { userCredentialsSchema } from './schemas/userCredentials.schema';
-import { SkipAuth } from 'src/utils/skipAuth.utils';
+import { SkipAuth } from '@/utils/skipAuth.utils';
 import { UserOutput } from './output/user.output';
 
 @Controller({
