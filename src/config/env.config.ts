@@ -1,9 +1,10 @@
+import { NodeEnv } from '@/api/enum/nodeEnv.enum';
 import { Logger } from '@nestjs/common';
 import 'dotenv/config';
 import env from 'src/types/env.type';
 
 class EnvConfig implements env {
-  nodeEnv: string;
+  nodeEnv: NodeEnv;
   apiPort: number;
   apiHost: string;
   dbHost: string;
@@ -14,15 +15,17 @@ class EnvConfig implements env {
   sessionSecret: string;
   brcyptSaltRounds: number;
   jwtSecret: string;
+  frontendUrl: string;
 
   constructor() {
     this.assignEnv();
     this.assertEnv();
+    this.assertNodeEnv();
     Logger.debug('Environment set up');
   }
 
   private assignEnv() {
-    this.nodeEnv = process.env.NODE_ENV;
+    this.nodeEnv = process.env.NODE_ENV as NodeEnv;
     this.apiPort = Number(process.env.API_PORT);
     this.apiHost = process.env.API_HOST;
     this.dbHost = process.env.POSTGRES_HOST;
@@ -33,8 +36,18 @@ class EnvConfig implements env {
     this.sessionSecret = process.env.SESSION_SECRET;
     this.brcyptSaltRounds = Number(process.env.BCRYPT_SALT_ROUNDS);
     this.jwtSecret = process.env.JWT_SECRET;
+    this.frontendUrl = process.env.FRONTEND_URL;
   }
 
+  private assertNodeEnv() {
+    if (!Object.values(NodeEnv).includes(this.nodeEnv)) {
+      throw new Error(`Invalid NODE_ENV: ${this.nodeEnv}`);
+    }
+  }
+
+  /**
+   * This will throw an error if any env variable is missing at startup
+   */
   private assertEnv() {
     for (const key in this) {
       if (!this.hasOwnProperty(key)) {
