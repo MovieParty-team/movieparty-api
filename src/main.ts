@@ -5,6 +5,8 @@ import 'dotenv/config';
 import * as session from 'express-session';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NodeEnv } from './api/enum/nodeEnv.enum';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -14,9 +16,9 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        maxAge: 60000,
         httpOnly: envConfig.nodeEnv === 'production', // false in dev for debug
-        sameSite: 'lax',
+        secure: envConfig.nodeEnv === 'production',
+        path: '/',
       },
       name: 'movieparty.session',
     }),
@@ -31,8 +33,25 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  let corsOptions: CorsOptions;
+  if (envConfig.nodeEnv !== NodeEnv.DEV) {
+    corsOptions = {
+      origin: envConfig.frontendUrl,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    };
+  } else {
+    // in dev mode you can edit the options
+    corsOptions = {
+      origin: envConfig.frontendUrl,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    };
+  }
+
+  app.enableCors(corsOptions);
+
   await app.listen(process.env.API_PORT);
-  app.enableCors();
   Logger.debug(`Application listening on port ${process.env.API_PORT}`);
 }
 bootstrap();
