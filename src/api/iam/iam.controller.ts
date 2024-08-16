@@ -44,7 +44,7 @@ export class IamController {
         await this.iamService.getUserByUuid(query.uuid),
       );
       return {
-        data: user,
+        provided: user,
         message: 'user',
         success: true,
         accessToken: request.session.accessToken,
@@ -73,7 +73,7 @@ export class IamController {
     request.session.accessToken = accessToken;
     request.session.save();
     return {
-      data: { accessToken },
+      provided: { accessToken },
       message: 'register',
       success: true,
     };
@@ -99,7 +99,7 @@ export class IamController {
     request.session.accessToken = accessToken; // we also save the access token in the session in case frontend doesn't save it
     request.session.save();
     return {
-      data: { accessToken },
+      provided: { accessToken },
       message: 'login',
       success: true,
     };
