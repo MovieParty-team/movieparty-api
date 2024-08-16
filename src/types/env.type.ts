@@ -10,4 +10,5 @@ export default interface env {
   sessionSecret: string;
   brcyptSaltRounds: number;
   jwtSecret: string;
+  frontendUrl: string;
 }
