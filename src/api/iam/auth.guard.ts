@@ -7,9 +7,11 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { envConfig } from '@/config/env.config';
 import { IS_SKIP_AUTH } from '@/utils/skipAuth.utils';
+import { RequestSession } from '@/types/iamRequest.type';
+import { setCookie } from '@/utils/cookie.utils';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -29,42 +31,54 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token && !request.session.accessToken) {
-      Logger.debug('No token provided');
-      request.session.destroy();
-      throw new UnauthorizedException();
-    } else if (!request.session.refreshToken || !request.session.accessToken) {
-      Logger.debug('No refresh token or access token in session');
-      throw new UnauthorizedException();
-    } else if (await this.checkTokenExpired(request.session.refreshToken)) {
-      Logger.debug('Refresh token expired');
-      request.session.destroy();
-      throw new UnauthorizedException();
-    }
+    const response = context.switchToHttp().getResponse();
+    const { session } = request;
+    const { cookies } = request;
+
+    const refreshToken = request.session.refreshToken || cookies.refreshToken;
+
     try {
+      if (!session) throw new UnauthorizedException('No session');
+
+      if (!refreshToken) {
+        response.clearCookie('refreshToken');
+        request.session.destroy();
+        throw new UnauthorizedException('No refresh token');
+      } else if (await this.checkTokenExpired(refreshToken)) {
+        response.clearCookie('refreshToken');
+        request.session.destroy();
+        throw new UnauthorizedException('Refresh token expired');
+      }
+      // access token doesn't exist
+      else if (!request.session.accessToken) {
+        const payload = await this.verifyToken(refreshToken);
+        request['user'] = payload.sub;
+        await this.refreshTokenSet(payload.sub, request, response);
+        return true;
+      }
+
+      // access tokem exists
       const payload = await this.verifyToken(request.session.accessToken);
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload.sub;
-      Logger.debug('payload:', payload);
-      await this.refreshTokenSet(payload.sub, request);
+      await this.refreshTokenSet(payload.sub, request, response);
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         try {
-          const payload = await this.verifyToken(request.session.refreshToken);
-          await this.refreshTokenSet(payload.sub, request);
-          const newPayload = await this.verifyToken(
-            request.session.accessToken,
-          );
-          request['user'] = newPayload.sub;
+          const payload = await this.verifyToken(refreshToken);
+          await this.refreshTokenSet(payload.sub, request, response);
+          request['user'] = payload.sub;
           return true;
         } catch (refreshError) {
-          Logger.error('Error refreshing token:', refreshError.message);
+          Logger.error('Error refreshing token:', refreshError);
+          request.session.destroy();
+          response.clearCookie('refreshToken');
           throw new UnauthorizedException('Unable to refresh token');
         }
       }
-      Logger.error('Error verifying token:', error.message);
+      Logger.error('Error verifying token:', error);
+      response.clearCookie('refreshToken');
       throw new UnauthorizedException();
     }
     return true;
@@ -83,9 +97,12 @@ export class AuthGuard implements CanActivate {
     return now > exp;
   }
 
-  private async refreshTokenSet(sub: string, request: any): Promise<void> {
+  private async refreshTokenSet(
+    sub: string,
+    request: RequestSession,
+    response: Response,
+  ): Promise<void> {
     const payload = { sub: sub };
-    Logger.debug('entering function refresh');
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '60s',
       secret: envConfig.jwtSecret,
@@ -94,9 +111,13 @@ export class AuthGuard implements CanActivate {
       expiresIn: '6d',
       secret: envConfig.jwtSecret,
     });
-    Logger.debug('token signed');
     request.session.accessToken = accessToken;
     request.session.refreshToken = refreshToken;
+
+    response.clearCookie('refreshToken');
+
+    setCookie(response, { name: 'refreshToken', value: refreshToken });
+
     request.session.save();
   }
 

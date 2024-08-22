@@ -11,4 +11,5 @@ interface Session {
 
 export interface RequestSession extends Request {
   session: Session & Request['session'];
+  user?: string; // user uuuid
 }

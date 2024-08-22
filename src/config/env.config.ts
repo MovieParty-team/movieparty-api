@@ -16,6 +16,7 @@ class EnvConfig implements env {
   brcyptSaltRounds: number;
   jwtSecret: string;
   frontendUrl: string;
+  cookieSecret: string;
 
   constructor() {
     this.assignEnv();
@@ -37,6 +38,7 @@ class EnvConfig implements env {
     this.brcyptSaltRounds = Number(process.env.BCRYPT_SALT_ROUNDS);
     this.jwtSecret = process.env.JWT_SECRET;
     this.frontendUrl = process.env.FRONTEND_URL;
+    this.cookieSecret = process.env.COOKIE_SECRET;
   }
 
   private assertNodeEnv() {

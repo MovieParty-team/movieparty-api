@@ -11,4 +11,5 @@ export default interface env {
   brcyptSaltRounds: number;
   jwtSecret: string;
   frontendUrl: string;
+  cookieSecret: string;
 }

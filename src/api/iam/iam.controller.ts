@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UsePipes,
 } from '@nestjs/common';
 import { IamService } from './iam.service';
@@ -21,6 +22,8 @@ import { createUserSchema } from './schemas/createUser.schema';
 import { userCredentialsSchema } from './schemas/userCredentials.schema';
 import { SkipAuth } from '@/utils/skipAuth.utils';
 import { UserOutput } from './output/user.output';
+import { Response } from 'express';
+import { setCookie } from '@/utils/cookie.utils';
 
 @Controller({
   path: '/api',
@@ -53,6 +56,21 @@ export class IamController {
     throw new HttpException('Error loading user', HttpStatus.BAD_REQUEST);
   }
 
+  @Get('/user/me')
+  async getMe(
+    @Req() request: RequestSession,
+  ): Promise<ApiResponse<UserOutput>> {
+    const user = new UserOutput(
+      await this.iamService.getUserByUuid(request.user),
+    );
+    return {
+      provided: user,
+      message: 'user',
+      success: true,
+      accessToken: request.session.accessToken,
+    };
+  }
+
   @Post('/auth/register')
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(createUserSchema))
@@ -60,6 +78,7 @@ export class IamController {
   async registerUser(
     @Body() body: CreateUserDto,
     @Req() request: RequestSession,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<ApiResponse<{ accessToken: string }>> {
     const { accessToken, refreshToken } = await this.iamService.registerUser(
       this.createUserDto.hydrate(body),
@@ -71,6 +90,9 @@ export class IamController {
 
     request.session.refreshToken = refreshToken;
     request.session.accessToken = accessToken;
+
+    setCookie(response, { name: 'refreshToken', value: refreshToken });
+
     request.session.save();
     return {
       provided: { accessToken },
@@ -86,6 +108,7 @@ export class IamController {
   async loginUser(
     @Body() body: UserCredentialsDto,
     @Req() request: RequestSession,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<ApiResponse<{ accessToken: string }>> {
     const { accessToken, refreshToken } = await this.iamService.loginUser(
       this.userCredentialsDto.hydrate(body),
@@ -97,10 +120,34 @@ export class IamController {
 
     request.session.refreshToken = refreshToken;
     request.session.accessToken = accessToken; // we also save the access token in the session in case frontend doesn't save it
+
+    setCookie(response, { name: 'refreshToken', value: refreshToken });
+
     request.session.save();
     return {
       provided: { accessToken },
       message: 'login',
+      success: true,
+    };
+  }
+
+  @Get('/auth/logout')
+  @HttpCode(200)
+  async logoutUser(
+    @Req() request: RequestSession,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<ApiResponse<null>> {
+    request.session.destroy((err) => {
+      if (err) {
+        Logger.error(err);
+      }
+    });
+
+    response.clearCookie('refreshToken');
+
+    return {
+      provided: null,
+      message: 'logout',
       success: true,
     };
   }

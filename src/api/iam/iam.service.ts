@@ -42,6 +42,7 @@ export class IamService {
     const existingUser = await this.userRepo.findOneBy({
       email: newUser.email,
     });
+    // also check if username is already taken
     if (existingUser) {
       throw new UnauthorizedException('User already exists');
     }
