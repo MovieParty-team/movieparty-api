@@ -7,7 +7,6 @@ import {
   HttpStatus,
   Logger,
   Post,
-  Query,
   Req,
   Res,
   UsePipes,
@@ -16,7 +15,7 @@ import { IamService } from './iam.service';
 import { RequestSession, UserUuidRequest } from '@/types/iamRequest.type';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserCredentialsDto } from './dtos/userCredentials.dto';
-import { ApiResponse } from '@/types/apiResponse.type';
+import { StandardResponse } from '@/types/apiResponse.type';
 import { ZodValidationPipe } from '@/api/validators/zod.validator';
 import { createUserSchema } from './schemas/createUser.schema';
 import { userCredentialsSchema } from './schemas/userCredentials.schema';
@@ -24,6 +23,7 @@ import { SkipAuth } from '@/utils/skipAuth.utils';
 import { UserOutput } from './output/user.output';
 import { Response } from 'express';
 import { setCookie } from '@/utils/cookie.utils';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller({
   path: '/api',
@@ -37,14 +37,18 @@ export class IamController {
   ) {}
 
   @Get('/user')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'Get user by uuid',
+  })
   async getUser(
-    @Query() query: UserUuidRequest,
+    @Body() body: UserUuidRequest,
     @Req() request: RequestSession,
-  ): Promise<ApiResponse<UserOutput>> {
-    Logger.debug(query.uuid);
-    if (query.uuid) {
+  ): Promise<StandardResponse<UserOutput>> {
+    if (body.uuid) {
       const user = new UserOutput(
-        await this.iamService.getUserByUuid(query.uuid),
+        await this.iamService.getUserByUuid(body.uuid),
       );
       return {
         provided: user,
@@ -57,9 +61,14 @@ export class IamController {
   }
 
   @Get('/user/me')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'Get authenticated user',
+  })
   async getMe(
     @Req() request: RequestSession,
-  ): Promise<ApiResponse<UserOutput>> {
+  ): Promise<StandardResponse<UserOutput>> {
     const user = new UserOutput(
       await this.iamService.getUserByUuid(request.user),
     );
@@ -72,14 +81,15 @@ export class IamController {
   }
 
   @Post('/auth/register')
-  @HttpCode(200)
+  @HttpCode(201)
   @UsePipes(new ZodValidationPipe(createUserSchema))
   @SkipAuth()
+  @ApiResponse({ status: 200 })
   async registerUser(
     @Body() body: CreateUserDto,
     @Req() request: RequestSession,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ApiResponse<{ accessToken: string }>> {
+  ): Promise<StandardResponse<{ accessToken: string }>> {
     const { accessToken, refreshToken } = await this.iamService.registerUser(
       this.createUserDto.hydrate(body),
     );
@@ -102,14 +112,14 @@ export class IamController {
   }
 
   @Post('/auth/login')
-  @HttpCode(200)
+  @HttpCode(201)
   @UsePipes(new ZodValidationPipe(userCredentialsSchema))
   @SkipAuth()
   async loginUser(
     @Body() body: UserCredentialsDto,
     @Req() request: RequestSession,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ApiResponse<{ accessToken: string }>> {
+  ): Promise<StandardResponse<{ accessToken: string }>> {
     const { accessToken, refreshToken } = await this.iamService.loginUser(
       this.userCredentialsDto.hydrate(body),
     );
@@ -132,11 +142,12 @@ export class IamController {
   }
 
   @Get('/auth/logout')
-  @HttpCode(200)
+  @HttpCode(201)
+  @ApiResponse({ status: 200, description: 'Logout user' })
   async logoutUser(
     @Req() request: RequestSession,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ApiResponse<null>> {
+  ): Promise<StandardResponse<null>> {
     request.session.destroy((err) => {
       if (err) {
         Logger.error(err);

@@ -1,4 +1,4 @@
-export interface ApiResponse<T> {
+export interface StandardResponse<T> {
   provided: T;
   message: string;
   success: boolean;
