@@ -39,11 +39,16 @@ export class IamService {
     lastname: string;
     birthday: Date;
   }): Promise<{ accessToken: string; refreshToken: string }> {
-    const existingUser = await this.userRepo.findOneBy({
+    const existingEmail = await this.userRepo.findOneBy({
       email: newUser.email,
     });
+
+    const existingUsername = await this.userRepo.findOneBy({
+      username: newUser.username,
+    });
+
     // also check if username is already taken
-    if (existingUser) {
+    if (existingEmail || existingUsername) {
       throw new UnauthorizedException('User already exists');
     }
 
