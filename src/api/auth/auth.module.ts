@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '@/api/entities';
-import { IamController } from './iam.controller';
-import { IamService } from './iam.service';
+import { CreateUserDto } from './dtos/createUser.dto';
+import { UserCredentialsDto } from './dtos/userCredentials.dto';
 import { JwtModule } from '@nestjs/jwt';
 import { envConfig } from 'src/config/env.config';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [
@@ -14,7 +16,7 @@ import { envConfig } from 'src/config/env.config';
       secret: envConfig.jwtSecret,
     }),
   ],
-  controllers: [IamController],
-  providers: [IamService],
+  controllers: [AuthController],
+  providers: [AuthService, CreateUserDto, UserCredentialsDto],
 })
-export class IamModule {}
+export class AuthModule {}
