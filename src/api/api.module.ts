@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { IamModule } from './iam/iam.module';
-import { AuthGuard } from './iam/auth.guard';
+import { AuthGuard } from './auth/auth.guard';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [IamModule],
+  imports: [IamModule, AuthModule],
   controllers: [],
   providers: [
     {
