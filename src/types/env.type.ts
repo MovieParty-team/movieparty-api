@@ -1,5 +1,7 @@
+import { NodeEnv } from '@/api/enum/nodeEnv.enum';
+
 export default interface env {
-  nodeEnv: string;
+  nodeEnv: NodeEnv;
   apiPort: number;
   apiHost: string;
   dbHost: string;
