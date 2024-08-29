@@ -10,10 +10,10 @@ describe('AppController', () => {
   let jwtService: JwtService;
   let userTest: User;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     userRepo = {
-      findOneBy: jest.fn(),
-      save: jest.fn(),
+      findOneBy: jest.fn(() => userTest),
+      save: jest.fn(() => userTest),
     } as any;
 
     jwtService = {
@@ -52,32 +52,29 @@ describe('AppController', () => {
     expect(authService).toBeDefined();
   });
 
-  it('should register user', () => {
-    expect(
-      authService.registerUser({
-        email: userTest.email,
-        password: userTest.password,
-        firstname: userTest.firstname,
-        lastname: userTest.lastname,
-        username: userTest.username,
-        birthday: userTest.birthday,
-      }),
-    )
-      .resolves.toEqual(userTest)
-      .catch((err) => console.log(err));
+  it('should register user', async () => {
+    userRepo.findOneBy = jest.fn(() => null);
+    authService = new AuthService(userRepo, jwtService);
+
+    const register = await authService.registerUser({
+      email: userTest.email,
+      username: userTest.username,
+      password: userTest.password,
+      firstname: userTest.firstname,
+      lastname: userTest.lastname,
+      birthday: userTest.birthday,
+    });
+
+    expect(register).toEqual({
+      accessToken: 'token',
+      refreshToken: 'token',
+    });
   });
 
   it('should log in user', () => {
-    expect(
-      authService.loginUser({
-        email: userTest.email,
-        password: userTest.password,
-      }),
-    )
-      .resolves.toEqual({
-        accessToken: 'token',
-        refreshToken: 'token',
-      })
-      .catch((err) => console.log(err));
+    expect(authService.loginUser(userTest)).resolves.toEqual({
+      accessToken: 'token',
+      refreshToken: 'token',
+    });
   });
 });
