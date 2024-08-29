@@ -9,12 +9,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      ENV_FILE: ${{ secrets.env.ENV_FILE }}
     steps:
       - uses: actions/checkout@v3
       - name: Run a multi-line script
-        run: echo "$ENV_FILE" && npm install && npm run test:unit
+        run: mv .env.example .env && npm install && npm run test:unit
 
   build:
     runs-on: ubuntu-latest
