@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      API_PORT: ${{ secrets.API_PORT }}
     steps:
       - uses: actions/checkout@v3
       - name: Run a multi-line script
