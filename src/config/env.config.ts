@@ -1,4 +1,4 @@
-import { NodeEnv } from '@/api/enum/nodeEnv.enum';
+import { NodeEnv } from '@/enum/nodeEnv.enum';
 import { Logger } from '@nestjs/common';
 import 'dotenv/config';
 import env from 'src/types/env.type';
