@@ -1,4 +1,4 @@
-import { NodeEnv } from '@/api/enum/nodeEnv.enum';
+import { NodeEnv } from '@/enum/nodeEnv.enum';
 
 export default interface env {
   nodeEnv: NodeEnv;

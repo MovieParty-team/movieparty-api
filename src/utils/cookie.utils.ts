@@ -1,4 +1,4 @@
-import { NodeEnv } from '@/api/enum/nodeEnv.enum';
+import { NodeEnv } from '@/enum/nodeEnv.enum';
 import { envConfig } from '@/config/env.config';
 import { Request, Response } from 'express';
 
