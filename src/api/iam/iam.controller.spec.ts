@@ -3,6 +3,7 @@ import { IamController } from './iam.controller';
 import { IamService } from './iam.service';
 import { User } from '../entities';
 import { RequestSession } from '@/types/iamRequest.type';
+import { UserOutput } from './output/user.output';
 
 describe('Unit tests IAM', () => {
   let controller: IamController;
@@ -78,9 +79,22 @@ describe('Unit tests IAM', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return user when getting user by id', () => {
-    expect(
-      controller.getUser({ uuid: userTest.uuid }, {} as RequestSession),
-    ).resolves.toEqual(userTest);
+  it('should return user when getting user by id', async () => {
+    try {
+      const result = await controller.getUser({ uuid: userTest.uuid }, {
+        session: {
+          accessToken: 'token',
+        },
+      } as RequestSession);
+      expect(result).toEqual({
+        provided: new UserOutput(userTest),
+        message: 'user',
+        success: true,
+        accessToken: 'token',
+      });
+    } catch (error) {
+      console.error('Error in getUser:', error);
+      fail('getUser should not throw an error');
+    }
   });
 });
