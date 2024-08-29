@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      ENV_FILE: ${{ env.ENV_FILE }}
+      ENV_FILE: ${{ secrets.ENV_FILE }}
     steps:
       - uses: actions/checkout@v3
       - name: Run a multi-line script
