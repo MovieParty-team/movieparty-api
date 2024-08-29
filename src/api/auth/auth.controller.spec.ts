@@ -5,8 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserCredentialsDto } from './dtos/userCredentials.dto';
-import { RequestSession } from '@/types/iamRequest.type';
-import { Response } from 'express';
 
 describe('Unit Tests Auth', () => {
   let authService: AuthService;
@@ -129,6 +127,18 @@ describe('Unit Tests Auth', () => {
     userRepo.findOneBy = jest.fn(() => null);
     authService = new AuthService(userRepo, jwtService);
 
+    const mockResponse = {
+      cookie: jest.fn(),
+    } as any;
+
+    const mockSession = {
+      session: {
+        accessToken: 'token',
+        refreshToken: 'token',
+        save: jest.fn(),
+      },
+    } as any;
+
     expect(
       controller.registerUser(
         {
@@ -149,8 +159,8 @@ describe('Unit Tests Auth', () => {
             };
           }),
         },
-        {} as RequestSession,
-        {} as Response,
+        mockSession,
+        mockResponse,
       ),
     );
   });
