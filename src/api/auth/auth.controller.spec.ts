@@ -8,7 +8,7 @@ import { UserCredentialsDto } from './dtos/userCredentials.dto';
 import { RequestSession } from '@/types/iamRequest.type';
 import { Response } from 'express';
 
-describe('AppController', () => {
+describe('Unit Tests Auth', () => {
   let authService: AuthService;
   let controller: AuthController;
 
