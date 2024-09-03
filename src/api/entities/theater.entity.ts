@@ -7,8 +7,10 @@ export class Theater {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  allocine_id: string;
+  @Column({
+    unique: true,
+  })
+  provider_id: string;
 
   @Column()
   name: string;

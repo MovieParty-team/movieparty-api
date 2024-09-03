@@ -14,7 +14,7 @@ export const dataSourceOptions: DataSourceOptions = {
   logging: !isTestMode,
   entities: ['dist/**/*.entity.{js,ts}'],
   subscribers: [],
-  migrations: ['dist/migrations/*.{js,ts}'],
+  migrations: ['dist/src/migrations/*.{js,ts}'],
   // for functional tests
   dropSchema: isTestMode,
   synchronize: isTestMode,
