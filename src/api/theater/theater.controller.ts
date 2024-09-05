@@ -8,15 +8,15 @@ import {
 } from '@nestjs/common';
 import { TheaterService } from './theater.service';
 import { ApiQuery, ApiResponse } from '@nestjs/swagger';
-import TheaterOutput from './output/theater.output';
+import TheaterOutput, { InternalTheater } from './output/theater.output';
 import TheaterProviderData, { EntityType } from './dtos/theaterProvider.dto';
-import { Theater } from '../entities';
 import { ZodValidationPipe } from '../validators/zod.validator';
 import {
   searchTheaterSchema,
   SearchTheater,
 } from './schemas/seachTheater.schema';
 import { StandardResponse } from '@/types/apiResponse.type';
+import { Theater } from '../entities';
 
 @Controller({
   path: '/api/theater',
@@ -38,11 +38,13 @@ export class TheaterController {
   })
   async searchTheater(
     @Query() searchQuery: SearchTheater,
-  ): Promise<StandardResponse<TheaterProviderData[] | Theater[]>> {
+  ): Promise<StandardResponse<TheaterProviderData[] | InternalTheater[]>> {
     try {
       const providedTheater = await this.service.fetchProvider(
         searchQuery.name,
       );
+
+      const theaters = [];
 
       // save theaters in database so that they can be used later
       if (
@@ -56,11 +58,16 @@ export class TheaterController {
       ) {
         for (const provided of providedTheater as TheaterProviderData[]) {
           this.service.saveTheater(provided);
+          theaters.push(provided);
+        }
+      } else {
+        for (const provided of providedTheater as Theater[]) {
+          theaters.push(InternalTheater.fromEntity(provided));
         }
       }
 
       return {
-        provided: providedTheater,
+        provided: theaters,
         message: 'Theaters fetched successfully',
         success: true,
       };

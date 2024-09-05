@@ -58,13 +58,18 @@ export class TheaterService {
     });
 
     if (!existingTheater)
-      return this.theater.save({
-        provider_id: providedTheater.entity_id,
-        name: providedTheater.label,
-        city: providedTheater.data.city,
-        address: providedTheater.data.address,
-        zip: providedTheater.data.zip,
-        thumbnail: providedTheater.data.thumbnail,
-      });
+      return this.theater
+        .save({
+          provider_id: providedTheater.entity_id,
+          name: providedTheater.label,
+          city: providedTheater.data.city,
+          address: providedTheater.data.address,
+          zip: providedTheater.data.zip,
+          thumbnail: providedTheater.data.thumbnail,
+        })
+        .catch((error) => {
+          Logger.error(error);
+          return null;
+        });
   }
 }
