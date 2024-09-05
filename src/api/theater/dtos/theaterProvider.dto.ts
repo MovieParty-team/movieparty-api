@@ -50,8 +50,8 @@ class Scores {
 }
 
 export default class TheaterProviderData {
-  @ApiProperty({ enum: EntityType, enumName: 'EntityType' })
-  entity_type: EntityType;
+  @ApiProperty({ type: EntityType.THEATER, enumName: 'EntityType' })
+  entity_type: EntityType.THEATER;
 
   @ApiProperty({
     type: String,

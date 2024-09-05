@@ -18,6 +18,16 @@ export class Theater {
   @Column()
   city: string;
 
+  @Column({
+    nullable: true,
+  })
+  zip: string;
+
+  @Column({
+    nullable: true,
+  })
+  thumbnail: string;
+
   @Column()
   address: string;
 

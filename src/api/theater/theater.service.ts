@@ -63,6 +63,8 @@ export class TheaterService {
         name: providedTheater.label,
         city: providedTheater.data.city,
         address: providedTheater.data.address,
+        zip: providedTheater.data.zip,
+        thumbnail: providedTheater.data.thumbnail,
       });
   }
 }
