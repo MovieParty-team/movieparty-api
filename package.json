@@ -22,8 +22,8 @@
     "test:unit": "DB_TEST_MODE=true jest src/** --coverage --runInBand",
     "test:debug": "DB_TEST_MODE=true node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "DB_TEST_MODE=true jest --config ./test/jest-e2e.json",
-    "typeorm": "npm run build && npx typeorm -d dist/config/orm.config.js",
-    "migration:generate": "npm run typeorm -- migration:generate",
+    "typeorm": "npm run build && npx typeorm -d dist/src/config/orm.config.js",
+    "migration:generate": "npm run typeorm -- migration:generate ./src/migrations/",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert"
   },
