@@ -27,6 +27,8 @@ describe('Unit Tests Theater', () => {
       name: 'name',
       city: 'city',
       address: 'address',
+      zip: 'zip',
+      thumbnail: 'thumbnail',
       userTheaters: [],
       groups: [],
     };
