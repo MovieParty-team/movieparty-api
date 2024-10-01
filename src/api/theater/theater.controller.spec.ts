@@ -18,6 +18,11 @@ describe('Unit Tests Theater', () => {
       save: jest.fn(() => theaterTest),
     } as any;
 
+    // mock .catch() function in theaterRepo
+    jest
+      .spyOn(theaterRepo, 'save')
+      .mockImplementation(() => Promise.resolve(theaterTest));
+
     service = new TheaterService(theaterRepo);
     controller = new TheaterController(service);
 
