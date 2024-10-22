@@ -11,7 +11,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { TheaterService } from './theater.service';
-import { ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import TheaterOutput, { InternalTheater } from './output/theater.output';
 import TheaterProviderData, { EntityType } from './dtos/theaterProvider.dto';
 import { ZodValidationPipe } from '../validators/zod.validator';
@@ -27,6 +27,7 @@ import {
   getShowtimes,
   getShowtimesSchema,
 } from './schemas/getShowTimes.schema';
+import ShowTimesWithMovie from './dtos/showtimesProvider.dto';
 
 @Controller({
   path: '/api/theater',
@@ -91,6 +92,14 @@ export class TheaterController {
   @ApiResponse({
     status: 200,
     description: 'Returns theater data',
+    type: InternalTheater,
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+    description: 'Theater id',
+    example: 'C0159',
   })
   @UsePipes(new ZodValidationPipe(getTheaterSchema))
   async getTheater(
@@ -115,8 +124,25 @@ export class TheaterController {
   @ApiResponse({
     status: 200,
     description: 'Returns showtimes',
+    type: ShowTimesWithMovie,
   })
-  async getShowtimes(@Param() showTimesQuery: getShowtimes) {
+  @ApiParam({
+    name: 'theaterId',
+    type: String,
+    required: true,
+    description: 'Theater id',
+    example: 'C0159',
+  })
+  @ApiParam({
+    name: 'day',
+    type: String,
+    required: true,
+    description: 'Theater id',
+    example: '0',
+  })
+  async getShowtimes(
+    @Param() showTimesQuery: getShowtimes,
+  ): Promise<StandardResponse<ShowTimesWithMovie[]>> {
     try {
       const showtimes = await this.service.fetchProviderShowtimes(
         showTimesQuery.theaterId,
@@ -138,6 +164,13 @@ export class TheaterController {
   @ApiResponse({
     status: 200,
     description: 'Returns favorite status of a given theater',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+    description: 'Theater id',
+    example: 'C0159',
   })
   async getFavoriteStatus(
     @Req() request: RequestSession,
@@ -163,6 +196,13 @@ export class TheaterController {
   @ApiResponse({
     status: 200,
     description: 'Toggles favorite status of a given theater',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    required: true,
+    description: 'Theater id',
+    example: 'C0159',
   })
   async toggleFavorite(
     @Param() theater: getTheater,

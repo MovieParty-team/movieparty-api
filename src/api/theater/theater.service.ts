@@ -4,6 +4,7 @@ import { Theater, User, UserTheater } from '../entities';
 import { ILike, Repository } from 'typeorm';
 import TheaterProviderData from './dtos/theaterProvider.dto';
 import { envConfig } from '@/config/env.config';
+import ShowTimesWithMovie from './dtos/showtimesProvider.dto';
 
 @Injectable()
 export class TheaterService {
@@ -154,7 +155,10 @@ export class TheaterService {
     return !!existingTheater;
   }
 
-  async fetchProviderShowtimes(theaterId: string, day: string) {
+  async fetchProviderShowtimes(
+    theaterId: string,
+    day: string,
+  ): Promise<ShowTimesWithMovie[]> {
     const response = await fetch(
       `${envConfig.providerApiUrl}/showtimes/theater-${theaterId}/d-${day}`,
     );
@@ -171,7 +175,7 @@ export class TheaterService {
       return [];
     }
 
-    const results = data.results;
+    const results = data.results as ShowTimesWithMovie[];
     return results;
   }
 }
