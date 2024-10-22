@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { TheaterController } from './theater.controller';
 import { TheaterService } from './theater.service';
-import { Theater } from '../entities';
+import { Theater, User, UserTheater } from '../entities';
 import TheaterProviderData from './dtos/theaterProvider.dto';
 
 describe('Unit Tests Theater', () => {
@@ -9,6 +9,8 @@ describe('Unit Tests Theater', () => {
   let service: TheaterService;
 
   let theaterRepo: Repository<Theater>;
+  let userTheaterRepo: Repository<UserTheater>;
+  let userRepo: Repository<User>;
 
   let theaterTest: Theater;
 
@@ -23,7 +25,7 @@ describe('Unit Tests Theater', () => {
       .spyOn(theaterRepo, 'save')
       .mockImplementation(() => Promise.resolve(theaterTest));
 
-    service = new TheaterService(theaterRepo);
+    service = new TheaterService(theaterRepo, userTheaterRepo, userRepo);
     controller = new TheaterController(service);
 
     theaterTest = {

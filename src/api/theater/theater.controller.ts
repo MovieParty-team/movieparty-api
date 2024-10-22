@@ -3,7 +3,11 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
+  Param,
+  Put,
   Query,
+  Req,
   UsePipes,
 } from '@nestjs/common';
 import { TheaterService } from './theater.service';
@@ -17,6 +21,12 @@ import {
 } from './schemas/seachTheater.schema';
 import { StandardResponse } from '@/types/apiResponse.type';
 import { Theater } from '../entities';
+import { getTheater, getTheaterSchema } from './schemas/getTheater.schema';
+import { RequestSession } from '@/types/iamRequest.type';
+import {
+  getShowtimes,
+  getShowtimesSchema,
+} from './schemas/getShowTimes.schema';
 
 @Controller({
   path: '/api/theater',
@@ -72,6 +82,96 @@ export class TheaterController {
         success: true,
       };
     } catch (error) {
+      Logger.error(error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('/data/:id')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns theater data',
+  })
+  @UsePipes(new ZodValidationPipe(getTheaterSchema))
+  async getTheater(
+    @Param() theater: getTheater,
+  ): Promise<StandardResponse<InternalTheater>> {
+    try {
+      const theaterData = await this.service.getByProviderId(theater.id);
+
+      return {
+        provided: theaterData,
+        message: 'Theater data',
+        success: true,
+      };
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('/showtimes/:theaterId/:day')
+  @UsePipes(new ZodValidationPipe(getShowtimesSchema))
+  @ApiResponse({
+    status: 200,
+    description: 'Returns showtimes',
+  })
+  async getShowtimes(@Param() showTimesQuery: getShowtimes) {
+    try {
+      const showtimes = await this.service.fetchProviderShowtimes(
+        showTimesQuery.theaterId,
+        showTimesQuery.day,
+      );
+      return {
+        provided: showtimes,
+        message: 'Showtimes fetched successfully',
+        success: true,
+      };
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('/favorite/:id')
+  @UsePipes(new ZodValidationPipe(getTheaterSchema))
+  @ApiResponse({
+    status: 200,
+    description: 'Returns favorite status of a given theater',
+  })
+  async getFavoriteStatus(
+    @Req() request: RequestSession,
+    @Param() theater: getTheater,
+  ): Promise<StandardResponse<boolean>> {
+    try {
+      const favorite = await this.service.getFavoriteStatus(
+        request.user,
+        theater.id,
+      );
+      return {
+        provided: favorite,
+        message: 'Favorite status fetched successfully',
+        success: true,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Put('/favorite/:id')
+  @UsePipes(new ZodValidationPipe(getTheaterSchema))
+  @ApiResponse({
+    status: 200,
+    description: 'Toggles favorite status of a given theater',
+  })
+  async toggleFavorite(
+    @Param() theater: getTheater,
+    @Req() request: RequestSession,
+  ): Promise<void> {
+    try {
+      await this.service.favoriteTheater(request.user, theater.id);
+    } catch (error) {
+      Logger.error(error);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
