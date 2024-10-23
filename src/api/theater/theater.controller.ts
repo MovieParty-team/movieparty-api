@@ -210,9 +210,15 @@ export class TheaterController {
   async toggleFavorite(
     @Param() theater: getTheater,
     @Req() request: RequestSession,
-  ): Promise<void> {
+  ): Promise<StandardResponse<null>> {
     try {
       await this.service.favoriteTheater(request.user, theater.id);
+
+      return {
+        provided: null,
+        message: 'Favorite status updated successfully',
+        success: true,
+      };
     } catch (error) {
       Logger.error(error);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
