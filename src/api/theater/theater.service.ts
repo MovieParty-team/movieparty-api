@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, Logger } from '@nestjs/common';
-import { Theater, User, UserTheater } from '../../entities';
+import { Theater, User, UserTheater } from '@/entities';
 import { ILike, Repository } from 'typeorm';
 import TheaterProviderData from './dtos/theaterProvider.dto';
 import { envConfig } from '@/config/env.config';
