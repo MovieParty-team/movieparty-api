@@ -14,13 +14,13 @@ import { TheaterService } from './theater.service';
 import { ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import TheaterOutput, { InternalTheater } from './output/theater.output';
 import TheaterProviderData, { EntityType } from './dtos/theaterProvider.dto';
-import { ZodValidationPipe } from '../validators/zod.validator';
+import { ZodValidationPipe } from '../../validators/zod.validator';
 import {
   searchTheaterSchema,
   SearchTheater,
 } from './schemas/seachTheater.schema';
 import { StandardResponse } from '@/types/apiResponse.type';
-import { Theater } from '../entities';
+import { Theater } from '../../entities';
 import { getTheater, getTheaterSchema } from './schemas/getTheater.schema';
 import { RequestSession } from '@/types/iamRequest.type';
 import {
@@ -107,6 +107,9 @@ export class TheaterController {
   ): Promise<StandardResponse<InternalTheater>> {
     try {
       const theaterData = await this.service.getByProviderId(theater.id);
+
+      if (!theaterData)
+        throw new HttpException('Theater not found', HttpStatus.NOT_FOUND);
 
       return {
         provided: theaterData,

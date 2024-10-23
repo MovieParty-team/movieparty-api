@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { User } from '../entities';
+import { User } from '../../entities';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';

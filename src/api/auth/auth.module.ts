@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '@/api/entities';
+import { User } from '@/entities';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserCredentialsDto } from './dtos/userCredentials.dto';
 import { JwtModule } from '@nestjs/jwt';

@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { TheaterController } from './theater.controller';
 import { TheaterService } from './theater.service';
-import { Theater, User, UserTheater } from '../entities';
+import { Theater, User, UserTheater } from '../../entities';
 import TheaterProviderData from './dtos/theaterProvider.dto';
 
 describe('Unit Tests Theater', () => {

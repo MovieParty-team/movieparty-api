@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Theater, User, UserTheater } from '../entities';
+import { Theater, User, UserTheater } from '../../entities';
 import { TheaterController } from './theater.controller';
 import { TheaterService } from './theater.service';
 

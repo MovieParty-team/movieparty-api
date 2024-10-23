@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { IamController } from './iam.controller';
 import { IamService } from './iam.service';
-import { User } from '../entities';
+import { User } from '../../entities';
 import { RequestSession } from '@/types/iamRequest.type';
 import { UserOutput } from './output/user.output';
 
