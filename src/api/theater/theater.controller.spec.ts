@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { TheaterController } from './theater.controller';
 import { TheaterService } from './theater.service';
-import { Theater } from '../entities';
+import { Theater, User, UserTheater } from '../../entities';
 import TheaterProviderData from './dtos/theaterProvider.dto';
 
 describe('Unit Tests Theater', () => {
@@ -9,23 +9,14 @@ describe('Unit Tests Theater', () => {
   let service: TheaterService;
 
   let theaterRepo: Repository<Theater>;
+  let userTheaterRepo: Repository<UserTheater>;
+  let userRepo: Repository<User>;
 
   let theaterTest: Theater;
+  let userTheaterTest: UserTheater;
+  let userTest: User;
 
   beforeEach(async () => {
-    theaterRepo = {
-      findOneBy: jest.fn(() => theaterTest),
-      save: jest.fn(() => theaterTest),
-    } as any;
-
-    // mock .catch() function in theaterRepo
-    jest
-      .spyOn(theaterRepo, 'save')
-      .mockImplementation(() => Promise.resolve(theaterTest));
-
-    service = new TheaterService(theaterRepo);
-    controller = new TheaterController(service);
-
     theaterTest = {
       id: 1,
       provider_id: 'provider_id',
@@ -37,6 +28,57 @@ describe('Unit Tests Theater', () => {
       userTheaters: [],
       groups: [],
     };
+
+    userTest = {
+      id: 1,
+      uuid: 'uuid',
+      email: 'email',
+      username: 'username',
+      password: 'password',
+      is_verified: true,
+      is_admin: true,
+      firstname: 'firstname',
+      lastname: 'lastname',
+      bio: 'bio',
+      avatar: 'avatar',
+      birthday: new Date(),
+      userMovies: [],
+      followers: [],
+      following: [],
+      userTheaters: [],
+      userGroups: [],
+      groups: [],
+    };
+
+    userTheaterTest = {
+      id: 1,
+      user: userTest,
+      theater: theaterTest,
+    };
+
+    theaterRepo = {
+      findOneBy: jest.fn(() => theaterTest),
+      save: jest.fn(() => theaterTest),
+    } as any;
+
+    userTheaterRepo = {
+      findOneBy: jest.fn(() => userTheaterTest),
+      save: jest.fn(),
+      remove: jest.fn(() => Promise.resolve(null)),
+    } as any;
+
+    userRepo = {
+      findOneBy: jest.fn(() => userTest),
+      save: jest.fn(),
+    } as any;
+
+    // mock .catch() function in theaterRepo
+    jest
+      .spyOn(theaterRepo, 'save')
+      .mockImplementation(() => Promise.resolve(theaterTest));
+
+    service = new TheaterService(theaterRepo, userTheaterRepo, userRepo);
+    controller = new TheaterController(service);
   });
 
   it('should be defined', () => {
@@ -81,5 +123,20 @@ describe('Unit Tests Theater', () => {
 
     const result = await service.saveTheater(theaterProvided);
     expect(result).toBeDefined();
+  });
+
+  it('should get favorite status', async () => {
+    const result = await service.getFavoriteStatus('uuid', 'provider_id');
+    expect(result).toBeDefined();
+  });
+
+  it('should remove favorite', async () => {
+    await service.favoriteTheater('uuid', 'provider_id');
+    expect(userTheaterRepo.remove).toHaveBeenCalled();
+  });
+
+  it('should add favorite', async () => {
+    await service.favoriteTheater('uuid', 'provider_id');
+    expect(userTheaterRepo.save).toBeDefined();
   });
 });

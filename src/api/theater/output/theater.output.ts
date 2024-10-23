@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import TheaterProviderData from '../dtos/theaterProvider.dto';
-import { Theater } from '@/api/entities';
+import { Theater } from '@/entities';
 
 export class InternalTheater {
   @ApiProperty()
