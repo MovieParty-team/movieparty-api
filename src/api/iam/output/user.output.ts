@@ -1,4 +1,4 @@
-import { User } from '@/api/entities';
+import { User } from '@/entities';
 
 export class UserOutput {
   private uuid: string;

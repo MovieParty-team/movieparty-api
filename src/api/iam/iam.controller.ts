@@ -8,10 +8,11 @@ import {
   Req,
 } from '@nestjs/common';
 import { IamService } from './iam.service';
-import { RequestSession, UserUuidRequest } from '@/types/iamRequest.type';
+import { RequestSession } from '@/types/iamRequest.type';
 import { StandardResponse } from '@/types/apiResponse.type';
 import { UserOutput } from './output/user.output';
 import { ApiResponse } from '@nestjs/swagger';
+import { GetUser } from './schemas/getUser.schema';
 
 @Controller({
   path: '/api/iam',
@@ -27,7 +28,7 @@ export class IamController {
     description: 'Get user by uuid',
   })
   async getUser(
-    @Body() body: UserUuidRequest,
+    @Body() body: GetUser,
     @Req() request: RequestSession,
   ): Promise<StandardResponse<UserOutput>> {
     if (body.uuid) {

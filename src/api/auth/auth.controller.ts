@@ -15,7 +15,7 @@ import { RequestSession } from '@/types/iamRequest.type';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UserCredentialsDto } from './dtos/userCredentials.dto';
 import { StandardResponse } from '@/types/apiResponse.type';
-import { ZodValidationPipe } from '@/api/validators/zod.validator';
+import { ZodValidationPipe } from '@/validators/zod.validator';
 import { createUserSchema } from './schemas/createUser.schema';
 import { userCredentialsSchema } from './schemas/userCredentials.schema';
 import { SkipAuth } from '@/utils/skipAuth.utils';

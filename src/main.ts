@@ -5,7 +5,7 @@ import 'dotenv/config';
 import * as session from 'express-session';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { NodeEnv } from './api/enum/nodeEnv.enum';
+import { NodeEnv } from './enum/nodeEnv.enum';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import * as cookieParser from 'cookie-parser';
 
