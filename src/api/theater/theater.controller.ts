@@ -151,6 +151,13 @@ export class TheaterController {
         showTimesQuery.theaterId,
         showTimesQuery.day,
       );
+
+      const movies = showtimes.map((s) => s.movie);
+
+      for (const movie of movies) {
+        await this.service.saveMovie(movie);
+      }
+
       return {
         provided: showtimes,
         message: 'Showtimes fetched successfully',

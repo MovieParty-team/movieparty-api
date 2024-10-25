@@ -206,7 +206,7 @@ class MoviePoster {
   path: string;
 }
 
-export class Movie {
+export class ProvidedMovie {
   @ApiProperty()
   __typename: string;
 
@@ -291,8 +291,8 @@ class Showtimes {
 }
 
 export default class ShowTimesWithMovie {
-  @ApiProperty({ type: Movie })
-  movie: Movie;
+  @ApiProperty({ type: ProvidedMovie })
+  movie: ProvidedMovie;
 
   @ApiProperty({ type: Showtimes })
   showtimes: Showtimes;
