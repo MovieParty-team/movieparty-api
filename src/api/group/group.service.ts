@@ -14,10 +14,15 @@ export class GroupService {
   ) {}
 
   /**
-   * Create a new group associated with a user, provider, and movie.
-   * @param userUuid The uuid of the user who created the group.
-   * @param theaterId The provider id of the theater the group is associated with.
-   * @param movieId The id of the movie the group is associated with.
+   * Creates a new group, given the user uuid, theater provider id, movie provider id, and the date of the showtime.
+   *
+   * @param userUuid The uuid of the user creating the group.
+   * @param theaterId The provider id of the theater.
+   * @param movieId The provider id of the movie.
+   * @param showtimeDate The date of the showtime.
+   *
+   * @throws Error If the user, theater, or movie is not found.
+   *
    * @returns The newly created group.
    */
   async createGroup(
@@ -36,14 +41,13 @@ export class GroupService {
       throw new Error('User, theater, or movie not found');
     }
 
-    const group = this.groupRepo.create({
+    const group = this.groupRepo.save({
       name: movie.name,
       movie: movie,
       user: user,
       theater: theater,
       session_date: new Date(showtimeDate),
     });
-    await this.groupRepo.save(group);
     return group;
   }
 
