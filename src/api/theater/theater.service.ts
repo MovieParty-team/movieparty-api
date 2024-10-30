@@ -1,10 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, Logger } from '@nestjs/common';
-import { Theater, User, UserTheater } from '@/entities';
+import { Movie, Theater, User, UserTheater } from '@/entities';
 import { ILike, Repository } from 'typeorm';
 import TheaterProviderData from './dtos/theaterProvider.dto';
 import { envConfig } from '@/config/env.config';
-import ShowTimesWithMovie from './dtos/showtimesProvider.dto';
+import ShowTimesWithMovie, {
+  ProvidedMovie,
+} from './dtos/showtimesProvider.dto';
 
 @Injectable()
 export class TheaterService {
@@ -12,6 +14,7 @@ export class TheaterService {
     @InjectRepository(Theater) private theater: Repository<Theater>,
     @InjectRepository(UserTheater) private userTheater: Repository<UserTheater>,
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(Movie) private movie: Repository<Movie>,
   ) {}
 
   /**
@@ -177,5 +180,24 @@ export class TheaterService {
 
     const results = data.results as ShowTimesWithMovie[];
     return results;
+  }
+
+  async saveMovie(movie: ProvidedMovie): Promise<Movie> {
+    const existingMovie = await this.movie.findOneBy({
+      provider_id: movie.id,
+    });
+
+    if (existingMovie) {
+      return existingMovie;
+    } else {
+      return this.movie.save({
+        provider_id: movie.id,
+        name: movie.title,
+        poster: movie.poster.url,
+        synopsis: movie.synopsis,
+        genre: movie.genres.map((genre) => genre.tag).join(','),
+        casting: movie.credits.map((cast) => cast.person).join(','),
+      });
+    }
   }
 }
