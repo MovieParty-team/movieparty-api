@@ -7,6 +7,7 @@ export const createUserSchema = z.object({
   firstname: z.string(),
   lastname: z.string(),
   birthday: z.string(),
+  accessFrom: z.string().optional(),
 });
 
 export type CreateUser = z.infer<typeof createUserSchema>;

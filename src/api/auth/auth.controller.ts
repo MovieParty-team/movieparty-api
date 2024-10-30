@@ -23,6 +23,8 @@ import { Response } from 'express';
 import { setCookie } from '@/utils/cookie.utils';
 import { ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import AdminEnum from '@/enum/admin.enum';
+import { envConfig } from '@/config/env.config';
 
 @Controller({
   path: '/api/auth',
@@ -75,6 +77,15 @@ export class AuthController {
     @Req() request: RequestSession,
     @Res({ passthrough: true }) response: Response,
   ): Promise<StandardResponse<{ accessToken: string }>> {
+    if (
+      body.accessFrom === AdminEnum.ADMIN &&
+      request.headers.origin !== envConfig.adminUrl
+    ) {
+      throw new HttpException(
+        'Unauthorized access origin',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const { accessToken, refreshToken } = await this.authService.loginUser(
       this.userCredentialsDto.hydrate(body),
     );
