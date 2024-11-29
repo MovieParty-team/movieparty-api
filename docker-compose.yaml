@@ -1,0 +1,66 @@
+# think about using single containers for kubernetes
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: movieparty # edit and also in .env
+      POSTGRES_USER: movieparty # edit and also in .env
+      POSTGRES_DATABASE: movieparty # edit and also in .env
+      POSTGRES_ROOT_PASSWORD: admin # edit and also in .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - movieparty-db-data:/var/lib/mysql
+    networks:
+      - movieparty-network
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+    networks:
+      - movieparty-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=movieparty-network"
+      - "traefik.http.routers.movieparty.rule=Host(`api.movieparty.com`)"
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - "3002:3000"
+    networks:
+      - movieparty-network
+    labels:
+      - com.host.description=label
+      - com.host.name=grafana
+      - "traefik.enable=true"
+      - "traefik.docker.network=movieparty-network"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.movieparty.com`)"
+  traefik:
+    image: traefik
+    restart: always
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - movieparty-network
+
+volumes:
+  movieparty-db-data:
+
+networks:
+  movieparty-network:
+    driver: bridge
