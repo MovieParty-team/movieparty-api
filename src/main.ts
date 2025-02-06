@@ -38,14 +38,14 @@ async function bootstrap() {
   let corsOptions: CorsOptions;
   if (envConfig.nodeEnv !== NodeEnv.DEV) {
     corsOptions = {
-      origin: envConfig.frontendUrl,
+      origin: [envConfig.frontendUrl, envConfig.adminUrl],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     };
   } else {
     // in dev mode you can edit the options
     corsOptions = {
-      origin: envConfig.frontendUrl,
+      origin: [envConfig.frontendUrl, envConfig.adminUrl],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     };

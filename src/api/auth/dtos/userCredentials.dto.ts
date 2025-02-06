@@ -12,10 +12,16 @@ export class UserCredentialsDto implements userCredentials {
   })
   password: string;
 
+  @ApiProperty({
+    example: 'ADMIN',
+  })
+  accessFrom?: string;
+
   hydrate(data: userCredentials) {
     return {
       email: data.email,
       password: data.password,
+      accessFrom: data.accessFrom,
     };
   }
 }

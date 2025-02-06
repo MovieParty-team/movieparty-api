@@ -16,6 +16,7 @@ class EnvConfig implements env {
   brcyptSaltRounds: number;
   jwtSecret: string;
   frontendUrl: string;
+  adminUrl: string;
   cookieSecret: string;
   providerApiUrl: string;
 
@@ -39,6 +40,7 @@ class EnvConfig implements env {
     this.brcyptSaltRounds = Number(process.env.BCRYPT_SALT_ROUNDS);
     this.jwtSecret = process.env.JWT_SECRET;
     this.frontendUrl = process.env.FRONTEND_URL;
+    this.adminUrl = process.env.ADMIN_URL;
     this.cookieSecret = process.env.COOKIE_SECRET;
     this.providerApiUrl = process.env.PROVIDER_API_URL;
   }

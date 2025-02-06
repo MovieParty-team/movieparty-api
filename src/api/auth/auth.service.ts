@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '@/entities';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import AdminEnum from '@/enum/admin.enum';
 
 @Injectable()
 export class AuthService {
@@ -49,14 +50,20 @@ export class AuthService {
   async loginUser({
     email,
     password,
+    accessFrom,
   }: {
     email: string;
     password: string;
+    accessFrom?: string;
   }): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepo.findOneBy({ email });
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (accessFrom && !user.is_admin) {
+      throw new UnauthorizedException('Unauthorized access');
     }
 
     const isValid = await bcrypt.compare(password, user.password);
