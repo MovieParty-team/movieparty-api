@@ -7,6 +7,11 @@ export class Movie {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({
+    unique: true,
+  })
+  provider_id: string;
+
   @Column()
   name: string;
 

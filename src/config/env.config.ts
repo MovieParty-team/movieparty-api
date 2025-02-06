@@ -1,4 +1,4 @@
-import { NodeEnv } from '@/api/enum/nodeEnv.enum';
+import { NodeEnv } from '@/enum/nodeEnv.enum';
 import { Logger } from '@nestjs/common';
 import 'dotenv/config';
 import env from 'src/types/env.type';
@@ -17,6 +17,7 @@ class EnvConfig implements env {
   jwtSecret: string;
   frontendUrl: string;
   cookieSecret: string;
+  providerApiUrl: string;
 
   constructor() {
     this.assignEnv();
@@ -39,6 +40,7 @@ class EnvConfig implements env {
     this.jwtSecret = process.env.JWT_SECRET;
     this.frontendUrl = process.env.FRONTEND_URL;
     this.cookieSecret = process.env.COOKIE_SECRET;
+    this.providerApiUrl = process.env.PROVIDER_API_URL;
   }
 
   private assertNodeEnv() {

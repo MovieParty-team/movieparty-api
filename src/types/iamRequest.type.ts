@@ -1,9 +1,5 @@
 import { Request } from 'express';
 
-export interface UserUuidRequest extends Request {
-  uuid: string;
-}
-
 interface Session {
   accessToken: string;
   refreshToken: string;
